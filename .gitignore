@@ -1,0 +1,13 @@
+# Demo videos (large files — available via Drive link)
+smartcontrat demo/
+*.mp4
+
+# Presentation and paper (binary files)
+*.pptx
+*.pdf
+
+# Hardhat artifacts
+composable-blockchain-certification-implementation-scenarios/node_modules/
+composable-blockchain-certification-implementation-scenarios/cache/
+composable-blockchain-certification-implementation-scenarios/artifacts/
+composable-blockchain-certification-implementation-scenarios/.env

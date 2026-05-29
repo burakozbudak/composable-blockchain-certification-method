@@ -1,0 +1,27 @@
+{
+  "name": "composable-blockchain-certification-implementation-scenarios",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hardhat reference implementation and scenario suite for the EnergyStream composable blockchain certification framework (CBAM + RED III, Turkey-EU hydrogen corridor).",
+  "author": "Burak Ozbudak",
+  "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:hardhat": "hardhat run scripts/deploy.js",
+    "scenario:happy": "hardhat run scripts/scenario-happy-path.js",
+    "scenario:dispute-honest": "hardhat run scripts/scenario-dispute-honest-aggregator.js",
+    "scenario:dispute-fraud": "hardhat run scripts/scenario-dispute-fraud-detected.js",
+    "scenario:predicate-fail": "hardhat run scripts/scenario-predicate-failure.js",
+    "scenario:all": "hardhat run scripts/run-all-scenarios.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": ">5.0.0",
+    "hardhat": ">2.22.0"
+  },
+  "dependencies": {
+    "dotenv": ">16.0.0"
+  }
+}
