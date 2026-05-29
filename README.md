@@ -1,7 +1,6 @@
 # Composable Blockchain Certification Method — Project Folder Guide
 
 **Author:** Burak Ozbudak
-**Course:** BBG 664 Term Project
 **Topic:** A composable blockchain framework that bridges the EU's CBAM and
 RED III rules with renewable-hydrogen production on the Turkey–EU corridor.
 
