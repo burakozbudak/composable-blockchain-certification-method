@@ -38,9 +38,8 @@ composable-blockchain-certification-method/
 │   ├── server.js                           ← Node.js + Express REST API
 │   ├── schema.sql                          ← MySQL 8 schema (tables, triggers, procedures)
 │   ├── public/index.html                   ← vanilla HTML/JS dashboard
-│   ├── MYSQL_TEMELLERI.md                  ← MySQL design notes
-│   ├── package.json / package-lock.json
-│   └── README.md
+│   ├── package.json / package-lock.jso     ← MySQL design notes
+│   └── README.mdpackage.json / package-lock.json
 ├── .gitignore
 └── README.md
 ```
@@ -105,7 +104,7 @@ certificate's capacity at the database level.
 
 ```bash
 cd mysql-certification-api
-# create the hydrocert database from schema.sql (see MYSQL_TEMELLERI.md)
+# create the hydrocert database from schema.sql 
 npm install
 npm start              # starts the API on http://localhost:3000
 ```
