@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HydroCert Panel</title>
+<style>
+  :root{
+    --navy:#0f2235; --navy2:#1a3a5c; --accent:#1f9d8f;
+    --bg:#f4f6f8; --card:#ffffff; --line:#e2e8f0; --ink:#1f2933; --muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+  header{background:var(--navy);color:#fff;padding:20px 28px}
+  header h1{margin:0;font-size:20px;letter-spacing:.5px}
+  header p{margin:4px 0 0;color:#9db4cc;font-size:13px}
+  .wrap{max-width:1080px;margin:24px auto;padding:0 20px;display:grid;gap:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+  .card h2{margin:0 0 14px;font-size:15px;color:var(--navy);border-left:3px solid var(--accent);padding-left:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:4px}
+  .bar span{display:block;height:100%;background:var(--accent)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  input{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:13px;width:130px}
+  button{background:var(--navy2);color:#fff;border:0;padding:9px 16px;border-radius:6px;cursor:pointer;font-size:13px}
+  button:hover{background:var(--accent)}
+  .msg{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:6px;display:none}
+  .msg.ok{background:#e7f6f3;color:#0f6b5f;display:block}
+  .msg.err{background:#fdeaea;color:#a82424;display:block}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:#eef2f6;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>HydroCert · Yenilenebilir Hidrojen Sertifikasyon Paneli</h1>
+  <p>Türkiye–AB Yeşil Hidrojen Koridoru · MySQL + Node.js</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>Üreticiler</h2>
+    <table id="uretici-tbl">
+      <thead><tr><th>Üretici</th><th>Ülke</th><th class="num">Tesis</th><th class="num">Toplam Kapasite (MW)</th></tr></thead>
+      <tbody><tr><td colspan="4" style="color:var(--muted)">Yükleniyor…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Karbon Kredibilite İndeksi (CCI)</h2>
+    <div class="row" style="margin-bottom:14px">
+      <div><label>Eşik (kgCO₂/kgH₂)</label><input id="esik" type="number" step="0.1" value="3.0"></div>
+      <button onclick="loadCCI()">Hesapla</button>
+    </div>
+    <table id="cci-tbl">
+      <thead><tr><th>Üretici</th><th class="num">Ağırlıklı Karbon</th><th class="num">CCI Skoru</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Sertifika İhraç Et</h2>
+    <div class="row">
+      <div><label>Parti ID</label><input id="parti_id" value="1"></div>
+      <div><label>Seri No</label><input id="seri_no" value="API-UI-001"></div>
+      <div><label>Toplam kg</label><input id="toplam_kg" value="5000"></div>
+      <div><label>İhraç Tarihi</label><input id="ihrac_tarihi" value="2025-05-01"></div>
+      <div><label>Geçerlilik</label><input id="gecerlilik" value="2026-05-01"></div>
+      <button onclick="ihracEt()">İhraç Et</button>
+    </div>
+    <div id="ihrac-msg" class="msg"></div>
+  </div>
+
+</div>
+
+<script>
+const API = "";  // aynı sunucudan servis edildiği için boş (relative)
+
+async function loadUretici(){
+  const r = await fetch(API + "/uretici");
+  const data = await r.json();
+  const tb = document.querySelector("#uretici-tbl tbody");
+  tb.innerHTML = data.map(u =>
+    `<tr><td>${u.ad}</td><td><span class="pill">${u.ulke}</span></td>
+     <td class="num">${u.tesis_sayisi}</td>
+     <td class="num">${Number(u.toplam_kapasite_mw).toFixed(2)}</td></tr>`
+  ).join("");
+}
+
+async function loadCCI(){
+  const esik = document.querySelector("#esik").value || 3.0;
+  const r = await fetch(API + "/cci?esik=" + esik);
+  const data = await r.json();
+  const max = 100;
+  const tb = document.querySelector("#cci-tbl tbody");
+  tb.innerHTML = data.map(c => {
+    const skor = Number(c.cci_skor);
+    return `<tr><td>${c.ad}</td>
+      <td class="num">${Number(c.agirlikli_karbon).toFixed(3)}</td>
+      <td class="num">${skor.toFixed(1)}
+        <div class="bar"><span style="width:${Math.max(0,Math.min(100,skor))}%"></span></div></td></tr>`;
+  }).join("");
+}
+
+async function ihracEt(){
+  const body = {
+    parti_id: Number(document.querySelector("#parti_id").value),
+    seri_no: document.querySelector("#seri_no").value,
+    toplam_kg: Number(document.querySelector("#toplam_kg").value),
+    ihrac_tarihi: document.querySelector("#ihrac_tarihi").value,
+    gecerlilik: document.querySelector("#gecerlilik").value
+  };
+  const msg = document.querySelector("#ihrac-msg");
+  try{
+    const r = await fetch(API + "/sertifika", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if(r.ok){
+      msg.className = "msg ok";
+      msg.textContent = "✓ " + data.mesaj + " (id: " + data.sertifika_id + ")";
+    }else{
+      msg.className = "msg err";
+      msg.textContent = "✗ " + (data.hata || "Hata");
+    }
+  }catch(e){
+    msg.className = "msg err"; msg.textContent = "✗ Sunucuya ulasilamadi";
+  }
+}
+
+loadUretici();
+loadCCI();
+</script>
+</body>
+</html>
