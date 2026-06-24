@@ -1,0 +1,4 @@
+node_modules/
+*.log
+hydrocert_yedek.sql
+.env
