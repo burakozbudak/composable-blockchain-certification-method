@@ -30,7 +30,7 @@ Sertifika kapasitesini asan transfer, BEFORE INSERT trigger ile DB seviyesinde e
 
 \## Kurulum
 
-1\. MySQL'de hydrocert veritabanini olustur (sema dosyalari / MYSQL\_TEMELLERI.md'ye bak)
+1\. MySQL'de hydrocert veritabanini olustur (sema dosyalarına bak)
 
 2\. Bagimliliklari kur ve calistir:
 
