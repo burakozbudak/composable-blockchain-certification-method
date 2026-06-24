@@ -118,7 +118,7 @@ npm start              # starts the API on http://localhost:3000
 | POST | `/sertifika` | Create a certificate. |
 | GET | `/cci` | Carbon Credibility Index report. |
 
-See `mysql-certification-api/README.md` for schema and design detail.
+See `mysql-certification-api/README.md` for schema and design details.
 
 ---
 
