@@ -37,7 +37,7 @@
 <body>
 <header>
   <h1>HydroCert · Yenilenebilir Hidrojen Sertifikasyon Paneli</h1>
-  <p>Türkiye–AB Yeşil Hidrojen Koridoru · MySQL + Node.js</p>
+  <p>Türkiye–AB Yeşil Hidrojen Koridoru · MySQL + Node.js + Ethereum <span id="zincir-durum" class="pill" style="margin-left:6px">zincir: …</span></p>
 </header>
 
 <div class="wrap">
@@ -73,6 +73,23 @@
       <button onclick="ihracEt()">İhraç Et</button>
     </div>
     <div id="ihrac-msg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Sertifika Doğrula (MySQL + Blockchain)</h2>
+    <div class="row">
+      <div><label>Seri No</label><input id="dogrula-seri" value="API-UI-001" style="width:200px"></div>
+      <button onclick="dogrula()">Doğrula</button>
+    </div>
+    <div id="dogrula-msg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Son Sertifikalar</h2>
+    <table id="sertifika-tbl">
+      <thead><tr><th>Seri No</th><th class="num">Parti</th><th class="num">kg</th><th>Zincir Durumu</th><th>İşlem</th></tr></thead>
+      <tbody><tr><td colspan="5" style="color:var(--muted)">Yükleniyor…</td></tr></tbody>
+    </table>
   </div>
 
 </div>
@@ -123,7 +140,14 @@ async function ihracEt(){
     const data = await r.json();
     if(r.ok){
       msg.className = "msg ok";
-      msg.textContent = "✓ " + data.mesaj + " (id: " + data.sertifika_id + ")";
+      let z = "";
+      if(data.zincir && data.zincir.tx_hash){
+        z = ` · zincire gönderildi: <a href="${data.zincir.explorer}" target="_blank">${data.zincir.tx_hash.slice(0,14)}…</a>`;
+      }else if(data.zincir && data.zincir.durum === "hata"){
+        z = " · zincire yazılamadı (sadece MySQL)";
+      }
+      msg.innerHTML = "✓ " + data.mesaj + " (id: " + data.sertifika_id + ")" + z;
+      loadSertifika();
     }else{
       msg.className = "msg err";
       msg.textContent = "✗ " + (data.hata || "Hata");
@@ -133,8 +157,82 @@ async function ihracEt(){
   }
 }
 
+async function loadDurum(){
+  try{
+    const r = await fetch(API + "/durum");
+    const d = await r.json();
+    const el = document.querySelector("#zincir-durum");
+    el.textContent = "zincir: " + d.zincir;
+    el.style.background = d.zincir === "aktif" ? "#e7f6f3" : "#fdeaea";
+    el.style.color = d.zincir === "aktif" ? "#0f6b5f" : "#a82424";
+  }catch(e){}
+}
+
+const durumEtiket = {
+  zincir_disi: "zincir dışı",
+  gonderildi: "gönderildi ⏳",
+  onaylandi: "onaylandı ✓",
+  hata: "hata ✗",
+};
+
+async function loadSertifika(){
+  const tb = document.querySelector("#sertifika-tbl tbody");
+  try{
+    const r = await fetch(API + "/sertifika");
+    const data = await r.json();
+    if(!data.length){
+      tb.innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Kayıt yok</td></tr>`;
+      return;
+    }
+    tb.innerHTML = data.map(s => `<tr>
+      <td>${s.seri_no}</td>
+      <td class="num">${s.parti_id}</td>
+      <td class="num">${Number(s.toplam_kg).toFixed(0)}</td>
+      <td><span class="pill">${durumEtiket[s.zincir_durum] || s.zincir_durum || "—"}</span></td>
+      <td>${s.tx_hash ? `<a href="https://sepolia.etherscan.io/tx/${s.tx_hash}" target="_blank">${s.tx_hash.slice(0,12)}…</a>` : "—"}</td>
+    </tr>`).join("");
+  }catch(e){
+    tb.innerHTML = `<tr><td colspan="5" style="color:var(--muted)">Yüklenemedi</td></tr>`;
+  }
+}
+
+async function dogrula(){
+  const seri = document.querySelector("#dogrula-seri").value.trim();
+  const msg = document.querySelector("#dogrula-msg");
+  if(!seri) return;
+  try{
+    const r = await fetch(API + "/dogrula/" + encodeURIComponent(seri));
+    const d = await r.json();
+    if(!r.ok){
+      msg.className = "msg err"; msg.textContent = "✗ " + (d.hata || "Hata");
+      return;
+    }
+    const s = d.sertifika, z = d.zincir;
+    let zText;
+    if(z.durum === "dogrulandi"){
+      msg.className = "msg ok";
+      zText = `zincirde doğrulandı ✓ (sabitlenme: ${z.sabitlenme_zamani ? z.sabitlenme_zamani.slice(0,10) : "?"})`
+        + (z.explorer ? ` · <a href="${z.explorer}" target="_blank">işlemi gör</a>` : "");
+    }else if(z.durum === "UYUSMAZLIK"){
+      msg.className = "msg err";
+      zText = "⚠ UYUŞMAZLIK: MySQL kaydı zincirdeki özetle eşleşmiyor — kayıt değiştirilmiş olabilir!";
+    }else if(z.durum === "zincirde_yok"){
+      msg.className = "msg err";
+      zText = "MySQL'de var ama zincire sabitlenmemiş";
+    }else{
+      msg.className = "msg ok";
+      zText = "zincir doğrulaması kapalı (yalnız MySQL kaydı)";
+    }
+    msg.innerHTML = `Seri <b>${s.seri_no}</b> · parti ${s.parti_id} · ${Number(s.toplam_kg).toFixed(0)} kg · ${s.ihrac_tarihi} → ${s.gecerlilik}<br>${zText}`;
+  }catch(e){
+    msg.className = "msg err"; msg.textContent = "✗ Sunucuya ulaşılamadı";
+  }
+}
+
 loadUretici();
 loadCCI();
+loadSertifika();
+loadDurum();
 </script>
 </body>
 </html>

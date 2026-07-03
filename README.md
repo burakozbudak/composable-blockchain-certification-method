@@ -20,7 +20,12 @@ slash a fraudulent operator, and surviving batches become tradable ERC-1155
 certificates.
 
 The repository ships **two complementary implementations** of the same data
-model, plus the supporting docs.
+model — and, as of v1.1, a **hybrid bridge between them**: every certificate
+created in the MySQL implementation is also *anchored on-chain* (its keccak256
+digest is written to an Ethereum smart contract), so tampering with the
+relational record can be detected and proven cryptographically.
+
+**Live demo:** <https://composable-blockchain-certification-method-production.up.railway.app>
 
 ## What's in this repository
 
@@ -36,10 +41,14 @@ composable-blockchain-certification-method/
 │   └── README.md
 ├── mysql-certification-api/
 │   ├── server.js                           ← Node.js + Express REST API
+│   ├── chain.js                            ← ethers.js bridge (on-chain anchoring)
+│   ├── contracts/CertAnchor.sol            ← certificate-anchoring contract
+│   ├── scripts/deploy.js                   ← compiles + deploys CertAnchor
+│   ├── scripts/migrate.js                  ← adds chain columns to an existing DB
 │   ├── schema.sql                          ← MySQL 8 schema (tables, triggers, procedures)
 │   ├── public/index.html                   ← vanilla HTML/JS dashboard
-│   ├── package.json / package-lock.jso     ← MySQL design notes
-│   └── README.mdpackage.json / package-lock.json
+│   ├── .env.example                        ← DB + chain configuration
+│   └── package.json / package-lock.json
 ├── .gitignore
 └── README.md
 ```
@@ -93,21 +102,46 @@ batches, certificates and transfers for the Turkey–EU hydrogen corridor.
 
 - **MySQL 8** — InnoDB, transactions, triggers, stored procedures, window functions.
 - **Node.js + Express** — `mysql2` connection pool with prepared statements.
-- **Dashboard** — vanilla HTML/JS (`public/index.html`) that consumes the endpoints.
+- **Ethereum bridge** — `chain.js` (ethers.js v6) anchors each certificate's
+  keccak256 digest on-chain via `contracts/CertAnchor.sol`.
+- **Dashboard** — vanilla HTML/JS (`public/index.html`) that consumes the
+  endpoints, shows per-certificate chain status and links to the block explorer.
 
 Data model: producer → facility → production batch → certificate → transfer → buyer.
 The Carbon Credibility Index (CCI) is computed with threshold-based
 normalization, and a `BEFORE INSERT` trigger blocks transfers that exceed a
 certificate's capacity at the database level.
 
+### On-chain anchoring (hybrid mode)
+
+When a certificate is created via `POST /sertifika`, the API
+
+1. commits the row to MySQL inside a transaction,
+2. computes a canonical keccak256 digest of the certificate fields,
+3. sends `anchorCertificate(serialHash, dataHash)` to the `CertAnchor`
+   contract and stores the transaction hash next to the row
+   (`zincir_durum`: `gonderildi` → `onaylandi` once the block is confirmed).
+
+`GET /dogrula/:seri_no` then re-computes the digest from the *current* MySQL
+row and compares it with the digest stored on-chain — if the relational record
+was modified after issuance, the endpoint reports a mismatch (`UYUSMAZLIK`).
+Chain anchoring is **optional**: if `RPC_URL` / `PRIVATE_KEY` /
+`CERT_ANCHOR_ADDRESS` are not configured, the API runs in MySQL-only mode.
+
 **Run it yourself:**
 
 ```bash
 cd mysql-certification-api
-# create the hydrocert database from schema.sql 
+# create the hydrocert database from schema.sql
 npm install
-npm start              # starts the API on http://localhost:3000
+cp .env.example .env       # fill in DB + (optionally) chain settings
+npm run migrate            # only for pre-v1.1 databases: adds the chain columns
+npm run deploy:contract    # optional: deploys CertAnchor (Sepolia recommended)
+npm start                  # starts the API on http://localhost:3000
 ```
+
+For a fully local test chain: `npx hardhat node`, then use
+`RPC_URL=http://127.0.0.1:8545` with one of the printed test keys.
 
 **Endpoints:**
 
@@ -115,8 +149,11 @@ npm start              # starts the API on http://localhost:3000
 | --- | --- | --- |
 | GET | `/uretici` | List producers. |
 | GET | `/uretici/:ulke` | List producers by country. |
-| POST | `/sertifika` | Create a certificate. |
+| GET | `/sertifika` | List recent certificates with chain status. |
+| POST | `/sertifika` | Create a certificate (+ anchor its digest on-chain). |
+| GET | `/dogrula/:seri_no` | Verify a certificate against the on-chain digest. |
 | GET | `/cci` | Carbon Credibility Index report. |
+| GET | `/durum` | API / chain-bridge status. |
 
 See `mysql-certification-api/README.md` for schema and design details.
 
@@ -129,6 +166,8 @@ See `mysql-certification-api/README.md` for schema and design details.
 - Automated unit tests with predictable expected events.
 - Each scenario deploys its own contract, so state is independent.
 - MySQL schema is reproducible from `schema.sql`; integrity is enforced with triggers and constraints.
+- On-chain anchoring is reproducible on a local Hardhat node — no testnet
+  funds required (`npx hardhat node` + `npm run deploy:contract`).
 - Production gaps explicitly listed in the scenarios `README.md` (Merkle proof
   verification, 24 h window, OpenZeppelin AccessControl, full ERC-1155 metadata).
 
