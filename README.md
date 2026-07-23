@@ -49,6 +49,11 @@ composable-blockchain-certification-method/
 │   ├── public/index.html                   ← vanilla HTML/JS dashboard
 │   ├── .env.example                        ← DB + chain configuration
 │   └── package.json / package-lock.json
+├── job-search-resume-matcher/               ← resume-driven job search & matching tool
+│   ├── job_matcher/                        ← fetchers, scoring, location filter, report/cover-letter rendering
+│   ├── fixtures/sample_jobs.json           ← offline demo dataset
+│   ├── tests/                              ← pytest suite (no network required)
+│   └── main.py                             ← CLI: fetch → match → report
 ├── .gitignore
 └── README.md
 ```
@@ -158,6 +163,19 @@ For a fully local test chain: `npx hardhat node`, then use
 See `mysql-certification-api/README.md` for schema and design details.
 
 ---
+
+---
+
+## 3 — `job-search-resume-matcher/` (unrelated side tool)
+
+A standalone tool with no dependency on the certification framework above:
+it fetches postings from free public job-board APIs (Remotive, Arbeitnow,
+Jobicy, RemoteOK), scores each against Burak Ozbudak's resume across four
+skill tracks (process/chemical engineering, frontend/web, blockchain,
+project management), and keeps only the matches located in Turkey or
+remote/abroad. Output is a ranked Markdown/HTML report plus optional
+templated cover-letter drafts — see its own `README.md` for scope,
+limitations (no auto-submission), and usage.
 
 ## Reproducibility checklist
 

@@ -1,0 +1,100 @@
+{
+  "name": "Burak Ozbudak",
+  "email": "burakozbudak1@gmail.com",
+  "location": "Ankara, Turkey",
+  "headline": "Chemical Engineer & Software Engineer",
+  "linkedin": "linkedin.com/in/burakozbudak",
+  "github": "https://github.com/burakozbudak",
+  "summary": "Solution-oriented Chemical Engineer with a strong background in industrial process design, energy production, and production efficiency, currently pursuing a Master's in Software Engineering to bridge physical operations and digital system optimization. Experience leading multi-disciplinary teams and managing the full lifecycle of technical projects with Agile methodologies.",
+  "experience": [
+    {
+      "company": "Roketsan Missiles Inc.",
+      "title": "Process Design Engineer",
+      "location": "Ankara, Turkey",
+      "start": "2023-08",
+      "end": "2024-02",
+      "highlights": [
+        "Lead process design engineer for polymer-bonded explosives (PBX) projects",
+        "Designed specialized equipment/apparatus to optimize production efficiency and quality",
+        "Implemented Agile methodologies in multi-disciplinary RD&I teams"
+      ]
+    },
+    {
+      "company": "Eti Soda / We Soda",
+      "title": "Energy Production Engineer",
+      "location": "Ankara, Turkey",
+      "start": "2022-09",
+      "end": "2023-08",
+      "highlights": [
+        "Managed energy production units: turbines, boilers, auxiliary facilities",
+        "Authored production evaluation reports and KPI plans",
+        "Supervised fault elimination and maintenance projects"
+      ]
+    },
+    {
+      "company": "Cimsa Afyon Cement",
+      "title": "Process Development Engineer",
+      "location": "Afyon, Turkey",
+      "start": "2022-05",
+      "end": "2022-09",
+      "highlights": [
+        "Monitored CCR variables, root-cause analysis for cement production",
+        "Production planning projections and energy/fuel data reports",
+        "Coordinated maintenance schedules to minimize energy costs"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "school": "Hacettepe University",
+      "degree": "M.Sc. Software Engineering",
+      "status": "Ongoing (started Feb 2025), GPA 3.57/4.00, Honor Student",
+      "projects": [
+        "Composable Blockchain Certification System (Solidity, Smart Contracts, CBAM)",
+        "ABSA Oil Supply Chain Optimization (Python, Mathematical Optimization, CPLEX)",
+        "Promptum - Integrated Process Modeling & Management (SPMP, WBS, Project Planning)"
+      ]
+    },
+    {
+      "school": "Hacettepe University",
+      "degree": "B.Sc. Chemical Engineering",
+      "status": "2016-2021, GPA 3.10/4.00, Honor Student",
+      "projects": [
+        "2nd Place, 2021 Project Design Competition",
+        "3rd Place, Innovative Entrepreneurs Award"
+      ]
+    }
+  ],
+  "tools": [
+    "MATLAB",
+    "Simulink",
+    "ChemCAD",
+    "MS Project",
+    "SAP",
+    "Microsoft Office"
+  ],
+  "software_skills": [
+    "JavaScript",
+    "HTML",
+    "CSS",
+    "React",
+    "Tailwind CSS",
+    "Redux",
+    "TanStack Query",
+    "Cypress",
+    "Python",
+    "Java",
+    "Solidity",
+    "Smart Contracts"
+  ],
+  "management_skills": [
+    "Lean Six Sigma Green Belt",
+    "Kaizen Practitioner",
+    "Agile",
+    "Scrum"
+  ],
+  "languages": [
+    "English (B2-C1)",
+    "Turkish (native)"
+  ]
+}

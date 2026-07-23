@@ -11,3 +11,9 @@ composable-blockchain-certification-implementation-scenarios/node_modules/
 composable-blockchain-certification-implementation-scenarios/cache/
 composable-blockchain-certification-implementation-scenarios/artifacts/
 composable-blockchain-certification-implementation-scenarios/.env
+
+# Job Search & Resume Matcher — generated run output
+job-search-resume-matcher/output/
+job-search-resume-matcher/__pycache__/
+job-search-resume-matcher/**/__pycache__/
+job-search-resume-matcher/.pytest_cache/

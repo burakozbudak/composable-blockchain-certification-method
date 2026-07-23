@@ -1,0 +1,102 @@
+[
+  {
+    "title": "Process Engineer - Energy & Utilities",
+    "company": "Arcelik A.S.",
+    "location": "Ankara, Turkey",
+    "description": "We are looking for a Process Engineer to optimize production efficiency at our energy production units, covering turbines, boilers and auxiliary facilities. Root cause analysis and Lean Six Sigma experience preferred. Agile/Scrum exposure a plus.",
+    "url": "https://example.com/jobs/arcelik-process-engineer",
+    "source": "sample",
+    "tags": ["process engineer", "energy production", "manufacturing"],
+    "posted": "2026-07-10"
+  },
+  {
+    "title": "Junior React Frontend Developer",
+    "company": "Insider",
+    "location": "Istanbul, Turkey",
+    "description": "Build customer-facing dashboards with React, Redux and TanStack Query. Tailwind CSS for styling, Cypress for e2e tests. REST API integration with our Node.js backend.",
+    "url": "https://example.com/jobs/insider-react-dev",
+    "source": "sample",
+    "tags": ["react", "redux", "frontend", "javascript"],
+    "posted": "2026-07-15"
+  },
+  {
+    "title": "Smart Contract / Solidity Engineer (Remote)",
+    "company": "ChainForge Labs",
+    "location": "Remote - Worldwide",
+    "description": "Design and audit Solidity smart contracts for a DeFi settlement protocol on Ethereum/EVM chains. Experience with Hardhat, dispute-resolution or predicate-engine style contract architecture is a big plus.",
+    "url": "https://example.com/jobs/chainforge-solidity",
+    "source": "sample",
+    "tags": ["blockchain", "solidity", "web3", "smart contract"],
+    "posted": "2026-07-05"
+  },
+  {
+    "title": "Process Development Engineer - Chemicals",
+    "company": "BASF",
+    "location": "Ludwigshafen, Germany",
+    "description": "Join our process development team optimizing chemical production processes, energy efficiency and plant operations. MATLAB/Simulink modeling experience valued. Relocation support provided.",
+    "url": "https://example.com/jobs/basf-process-dev",
+    "source": "sample",
+    "tags": ["chemical engineering", "process development", "manufacturing"],
+    "posted": "2026-06-28"
+  },
+  {
+    "title": "Full-Stack Developer (React + Python)",
+    "company": "Remote Circle",
+    "location": "Remote - EU/Turkey timezone",
+    "description": "Full-stack role building internal tools with React on the frontend and Python on the backend. Familiarity with agile delivery and REST APIs required.",
+    "url": "https://example.com/jobs/remotecircle-fullstack",
+    "source": "sample",
+    "tags": ["react", "python", "full stack"],
+    "posted": "2026-07-18"
+  },
+  {
+    "title": "Blockchain Developer - Sustainability Protocols",
+    "company": "GreenChain Labs",
+    "location": "Amsterdam, Netherlands (hybrid, visa sponsorship available)",
+    "description": "Build on-chain certification and carbon-credit tooling using Solidity and smart contracts, bridging EU regulatory data (CBAM-style reporting) with blockchain settlement.",
+    "url": "https://example.com/jobs/greenchain-blockchain-dev",
+    "source": "sample",
+    "tags": ["blockchain", "solidity", "smart contract", "sustainability"],
+    "posted": "2026-07-01"
+  },
+  {
+    "title": "Energy Production Engineer",
+    "company": "We Soda Group",
+    "location": "Kocaeli, Turkey",
+    "description": "Manage operations for energy production units, author production evaluation reports, and supervise fault-elimination and maintenance projects with technical departments.",
+    "url": "https://example.com/jobs/wesoda-energy-engineer",
+    "source": "sample",
+    "tags": ["energy production", "process engineer"],
+    "posted": "2026-07-12"
+  },
+  {
+    "title": "Software Engineer - Blockchain Team",
+    "company": "USChain Corp",
+    "location": "Remote (must be authorized to work in the US without sponsorship)",
+    "description": "Work on Ethereum smart contracts and Web3 tooling. Solidity, Hardhat, JavaScript.",
+    "url": "https://example.com/jobs/uschain-swe",
+    "source": "sample",
+    "tags": ["blockchain", "solidity", "javascript"],
+    "posted": "2026-06-30"
+  },
+  {
+    "title": "Marketing Manager",
+    "company": "GlobalBrands Inc.",
+    "location": "Toronto, Canada",
+    "description": "Lead brand campaigns and social media strategy for our consumer products line.",
+    "url": "https://example.com/jobs/globalbrands-marketing",
+    "source": "sample",
+    "tags": ["marketing", "branding"],
+    "posted": "2026-07-08"
+  },
+  {
+    "title": "Project Engineer - Cement & Materials",
+    "company": "Cimsa",
+    "location": "Afyon, Turkey",
+    "description": "Monitor CCR variables, run root cause analysis on cement production processes, and coordinate maintenance schedules with mechanical and electrical units using Agile/Kaizen practices.",
+    "url": "https://example.com/jobs/cimsa-project-engineer",
+    "source": "sample",
+    "tags": ["cement", "process engineer", "kaizen"],
+    "posted": "2026-07-14"
+  }
+]
