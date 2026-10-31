@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "node --env-file-if-exists=.env server.js",
+    "init-db": "node --env-file-if-exists=.env scripts/init-db.js",
     "migrate": "node --env-file-if-exists=.env scripts/migrate.js",
     "deploy:contract": "node --env-file-if-exists=.env scripts/deploy.js"
   },

@@ -35,7 +35,8 @@ export function sertifikaOzeti({ parti_id, seri_no, toplam_kg, ihrac_tarihi, gec
   const kanonik = JSON.stringify({
     parti_id: String(parti_id),
     seri_no: String(seri_no),
-    toplam_kg: String(toplam_kg),
+    // Number() ile normalize: "5000.00" ve 5000 ayni ozeti uretir.
+    toplam_kg: String(Number(toplam_kg)),
     ihrac_tarihi: String(ihrac_tarihi),
     gecerlilik: String(gecerlilik),
   });

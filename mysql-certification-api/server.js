@@ -9,29 +9,26 @@ import {
   sertifikaOzeti,
   EXPLORER_TX_URL,
 } from './chain.js';
+import { baglantiAyarlari } from './db.js';
+import { evrenAktif, MODELLER } from './evren.js';
+import { aiRouter, hizSiniri } from './ai.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 3306,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'hydro2026',
-  database: process.env.DB_NAME || 'hydrocert',
-  waitForConnections: true,
-  connectionLimit: 10,
-  charset: 'utf8mb4',
-  decimalNumbers: true,
-  // DATE alanlari string donmeli; Date objesine cevrilirse timezone
-  // kaymasi olur ve zincirdeki veri ozeti (hash) tutmaz.
-  dateStrings: true,
-});
+const pool = mysql.createPool(
+  baglantiAyarlari({ waitForConnections: true, connectionLimit: 5 }),
+);
 
 const app = express();
-app.use(express.json());
+app.set('trust proxy', 1); // Render vb. ters vekil arkasinda gercek IP icin
+app.use(express.json({ limit: '8mb' })); // belge gorselleri base64 gelir
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/durum', (req, res) => {
-  res.json({ zincir: zincirAktif() ? 'aktif' : 'kapali' });
+  res.json({
+    zincir: zincirAktif() ? 'aktif' : 'kapali',
+    evren: evrenAktif() ? 'aktif' : 'kapali',
+    modeller: evrenAktif() ? MODELLER : null,
+  });
 });
 
 app.get('/uretici', async (req, res) => {
@@ -76,7 +73,8 @@ app.get('/sertifika', async (req, res) => {
   }
 });
 
-app.post('/sertifika', async (req, res) => {
+// Herkese acik demoda zincir islemlerini (test ETH) korumak icin sinirli.
+app.post('/sertifika', hizSiniri({ max: Number(process.env.WRITE_RATE_LIMIT_PER_MIN) || 5 }), async (req, res) => {
   const { parti_id, seri_no, toplam_kg, ihrac_tarihi, gecerlilik } = req.body;
   if (!parti_id || !seri_no || !toplam_kg || !ihrac_tarihi || !gecerlilik) {
     return res.status(400).json({ hata: 'Tum alanlar zorunlu' });
@@ -176,20 +174,43 @@ app.get('/dogrula/:seri_no', async (req, res) => {
   }
 });
 
+// CCI saklı yordamla hesaplanir; yordam kurulamadiysa (bulut MySQL'de
+// yetki yoksa) ayni sorgu dogrudan calistirilir.
+const CCI_SQL = `SELECT u.ad,
+         ROUND(SUM(p.karbon_yogunlugu * p.h2_kg) / SUM(p.h2_kg), 3) AS agirlikli_karbon,
+         ROUND(100 * (1 - (SUM(p.karbon_yogunlugu * p.h2_kg) / SUM(p.h2_kg)) / ?), 1) AS cci_skor
+  FROM uretim_partisi p
+  JOIN tesis t   ON t.id = p.tesis_id
+  JOIN uretici u ON u.id = t.uretici_id
+  GROUP BY u.id, u.ad
+  ORDER BY cci_skor DESC`;
+
+export async function cciHesapla(esik) {
+  try {
+    const [rows] = await pool.execute(`CALL sp_uretici_cci(?)`, [esik]);
+    return rows[0];
+  } catch (e) {
+    if (e.errno !== 1305) throw e; // 1305: PROCEDURE does not exist
+    const [rows] = await pool.execute(CCI_SQL, [esik]);
+    return rows;
+  }
+}
+
 app.get('/cci', async (req, res) => {
   try {
     const esik = parseFloat(req.query.esik) || 3.0;
-    const [rows] = await pool.execute(`CALL sp_uretici_cci(?)`, [esik]);
-    res.json(rows[0]);
+    res.json(await cciHesapla(esik));
   } catch (e) {
     console.error(e);
     res.status(500).json({ hata: 'CCI hesaplanamadi' });
   }
 });
 
+app.use('/ai', aiRouter({ pool, cciHesapla }));
+
 const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, () =>
   console.log(
-    `✓ HydroCert API http://localhost:${PORT} · zincir: ${zincirAktif() ? 'AKTIF' : 'kapali (RPC_URL/PRIVATE_KEY/CERT_ANCHOR_ADDRESS tanimlanmamis)'}`,
+    `✓ HydroCert API http://localhost:${PORT} · zincir: ${zincirAktif() ? 'AKTIF' : 'kapali (RPC_URL/PRIVATE_KEY/CERT_ANCHOR_ADDRESS tanimlanmamis)'} · EVREN: ${evrenAktif() ? 'AKTIF' : 'kapali (EVREN_API_KEY yok)'}`,
   ),
 );
