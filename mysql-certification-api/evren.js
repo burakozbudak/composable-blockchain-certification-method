@@ -8,6 +8,9 @@ const API_KEY = process.env.EVREN_API_KEY;
 
 export const MODELLER = {
   sohbet: process.env.EVREN_CHAT_MODEL || 'glm-5.3',
+  // Ana model yogun/dolu ise (503, 429 fair_share) sirayla denenecek yedekler.
+  sohbetYedek: (process.env.EVREN_CHAT_FALLBACKS || 'qwen3.8-flash-next,auto')
+    .split(',').map((m) => m.trim()).filter(Boolean),
   ocr: process.env.EVREN_OCR_MODEL || 'dots-ocr',
   karar: process.env.EVREN_DECISION_MODEL || 'clef',
   gomme: process.env.EVREN_EMBED_MODEL || 'qwen3-embedding-8b',
@@ -51,17 +54,31 @@ async function istek(yol, govde, { timeoutMs = 90_000 } = {}) {
 
 // --- Sohbet (glm-5.3) -------------------------------------------------------
 export async function sohbet(mesajlar, { json = false, maxTokens = 4096 } = {}) {
-  const govde = {
-    model: MODELLER.sohbet,
-    messages: mesajlar,
-    max_tokens: maxTokens,
-    // Panel icin hizli yanit: dusunme modu kapali (EVREN'e ozgu parametre).
-    thinking: false,
-    temperature: 0.2,
-  };
-  if (json) govde.response_format = { type: 'json_object' };
-  const veri = await istek('/chat/completions', govde);
-  return veri.choices?.[0]?.message?.content?.trim() || '';
+  const modeller = [MODELLER.sohbet, ...MODELLER.sohbetYedek];
+  let sonHata;
+  for (const model of modeller) {
+    const govde = {
+      model,
+      messages: mesajlar,
+      max_tokens: maxTokens,
+      // Panel icin hizli yanit: dusunme modu kapali (EVREN'e ozgu parametre).
+      thinking: false,
+      temperature: 0.2,
+    };
+    if (json && model !== 'auto') govde.response_format = { type: 'json_object' };
+    try {
+      const veri = await istek('/chat/completions', govde);
+      return veri.choices?.[0]?.message?.content?.trim() || '';
+    } catch (e) {
+      sonHata = e;
+      const kapasite =
+        e.status === 503 || e.status === 404 || e.kod === 'fair_share_limit_exceeded' ||
+        e.name === 'TimeoutError';
+      if (!kapasite) throw e;
+      console.warn(`EVREN ${model} kullanilamadi (${e.kod || e.status}), yedek deneniyor`);
+    }
+  }
+  throw sonHata;
 }
 
 // --- Belge OCR (dots-ocr) ---------------------------------------------------
