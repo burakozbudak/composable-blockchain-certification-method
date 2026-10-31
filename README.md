@@ -25,7 +25,7 @@ created in the MySQL implementation is also *anchored on-chain* (its keccak256
 digest is written to an Ethereum smart contract), so tampering with the
 relational record can be detected and proven cryptographically.
 
-**Live demo:** _being redeployed on a free stack (Render + Aiven MySQL + Sepolia) — see `mysql-certification-api/README.md` → “Ucretsiz canliya alma”._
+**Live demo:** <https://hydrocert.onrender.com> — free stack (Render + Aiven MySQL + EVREN AI). The free instance sleeps when idle; the first request may take ~1 minute.
 
 ## What's in this repository
 
