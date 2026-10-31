@@ -1,14 +1,9 @@
 // sertifika tablosuna zincir kolonlarini ekler (varsa atlar).
 // Kullanim: node --env-file=.env scripts/migrate.js
 import mysql from 'mysql2/promise';
+import { baglantiAyarlari } from '../db.js';
 
-const conn = await mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 3306,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'hydro2026',
-  database: process.env.DB_NAME || 'hydrocert',
-});
+const conn = await mysql.createConnection(baglantiAyarlari());
 
 const kolonlar = [
   ['veri_hash', "VARCHAR(66) NULL COMMENT 'keccak256 sertifika ozeti'"],
