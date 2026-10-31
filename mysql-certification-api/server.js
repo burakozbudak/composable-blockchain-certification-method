@@ -12,6 +12,7 @@ import {
 import { baglantiAyarlari } from './db.js';
 import { evrenAktif, MODELLER } from './evren.js';
 import { aiRouter, hizSiniri } from './ai.js';
+import { gerekirseKur } from './schema-init.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pool = mysql.createPool(
@@ -209,6 +210,16 @@ app.get('/cci', async (req, res) => {
 app.use('/ai', aiRouter({ pool, cciHesapla }));
 
 const PORT = Number(process.env.PORT) || 3000;
+
+// Bulut kurulumunda (AUTO_INIT_DB=true) bos veritabani ilk acilista kurulur.
+if (String(process.env.AUTO_INIT_DB || '').toLowerCase() === 'true') {
+  try {
+    await gerekirseKur(pool);
+  } catch (e) {
+    console.error('Otomatik sema kurulumu basarisiz:', e.message);
+  }
+}
+
 app.listen(PORT, () =>
   console.log(
     `✓ HydroCert API http://localhost:${PORT} · zincir: ${zincirAktif() ? 'AKTIF' : 'kapali (RPC_URL/PRIVATE_KEY/CERT_ANCHOR_ADDRESS tanimlanmamis)'} · EVREN: ${evrenAktif() ? 'AKTIF' : 'kapali (EVREN_API_KEY yok)'}`,

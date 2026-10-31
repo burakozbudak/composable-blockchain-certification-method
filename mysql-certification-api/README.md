@@ -62,15 +62,11 @@ Notlar:
 | YZ | EVREN LLM API | `EVREN_API_KEY` |
 
 1. **Aiven** → Create service → MySQL → *Free plan*. Overview sayfasindan *Service URI* ve *CA certificate* degerlerini alin.
-2. Semayi bulut veritabanina kurun (kendi bilgisayarinizdan, bir kez):
-   ```bash
-   cd mysql-certification-api && npm install
-   # .env: DATABASE_URL, DB_SSL=true, DB_SSL_CA (ca.pem icerigi, satir sonlari \n)
-   npm run init-db
-   ```
-   `init-db`, dump'taki `DEFINER=root@localhost` ifadelerini temizler. Bulut kullanicisinin
-   trigger olusturma yetkisi yoksa uyari verir ve devam eder; CCI saklı yordami yoksa API
-   ayni hesabi dogrudan SQL ile yapar.
+2. Sema kurulumu otomatiktir: `render.yaml` icindeki `AUTO_INIT_DB=true` sayesinde sunucu,
+   bos bir veritabanina ilk acilista `schema.sql`'i kurar (doluysa dokunmaz). Elle kurmak icin
+   `.env`'i doldurup `npm run init-db` da calistirabilirsiniz. Dump'taki `DEFINER=root@localhost`
+   ifadeleri temizlenir; trigger yetkisi yoksa uyari verilir ve devam edilir, CCI saklı yordami
+   yoksa API ayni hesabi dogrudan SQL ile yapar.
 3. (Istege bagli) Sepolia'ya kontrat: `.env`'e `RPC_URL` ve **yalnizca test** `PRIVATE_KEY` yazip
    `npm run deploy:contract`; cikan adresi `CERT_ANCHOR_ADDRESS` olarak saklayin.
 4. **Render** → New → *Blueprint* → bu repo. Kokteki `render.yaml` servisi tanimlar; panel
