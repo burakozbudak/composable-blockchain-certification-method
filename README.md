@@ -25,7 +25,7 @@ created in the MySQL implementation is also *anchored on-chain* (its keccak256
 digest is written to an Ethereum smart contract), so tampering with the
 relational record can be detected and proven cryptographically.
 
-**Live demo:** <https://composable-blockchain-certification-method-production.up.railway.app>
+**Live demo:** _being redeployed on a free stack (Render + Aiven MySQL + Sepolia) — see `mysql-certification-api/README.md` → “Ucretsiz canliya alma”._
 
 ## What's in this repository
 
@@ -128,13 +128,22 @@ was modified after issuance, the endpoint reports a mismatch (`UYUSMAZLIK`).
 Chain anchoring is **optional**: if `RPC_URL` / `PRIVATE_KEY` /
 `CERT_ANCHOR_ADDRESS` are not configured, the API runs in MySQL-only mode.
 
+### AI layer (v1.2, EVREN)
+
+The dashboard adds four features backed by the [EVREN](https://evren.ssyz.org.tr)
+sovereign AI platform's OpenAI-compatible API (optional, `EVREN_API_KEY`):
+a CBAM / RED III assistant grounded in the panel data (`glm-5.3`), certificate
+form filling from document images (`dots-ocr`), a rule-based + model RFNBO
+compliance/risk score (`clef`), and semantic search over certificates and
+facilities (`qwen3-embedding-8b` + reranker).
+
 **Run it yourself:**
 
 ```bash
 cd mysql-certification-api
-# create the hydrocert database from schema.sql
 npm install
-cp .env.example .env       # fill in DB + (optionally) chain settings
+cp .env.example .env       # fill in DB + (optionally) chain and EVREN settings
+npm run init-db            # loads schema.sql (local or cloud MySQL)
 npm run migrate            # only for pre-v1.1 databases: adds the chain columns
 npm run deploy:contract    # optional: deploys CertAnchor (Sepolia recommended)
 npm start                  # starts the API on http://localhost:3000

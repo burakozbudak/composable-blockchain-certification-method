@@ -1,0 +1,34 @@
+# Render Blueprint — HydroCert (ucretsiz web servisi)
+# Render paneli → New → Blueprint → bu repoyu secin. Gizli degerler (sync: false)
+# ilk kurulumda panelde sorulur; repoya yazilmaz.
+services:
+  - type: web
+    name: hydrocert
+    runtime: node
+    plan: free
+    rootDir: mysql-certification-api
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /durum
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # --- MySQL (Aiven ucretsiz plan) ---
+      - key: DATABASE_URL        # Aiven "Service URI" (ssl-mode parametresi olmadan da olur)
+        sync: false
+      - key: DB_SSL
+        value: "true"
+      - key: DB_SSL_CA           # Aiven → Overview → CA certificate (ca.pem icerigi)
+        sync: false
+      # --- Ethereum Sepolia (istege bagli) ---
+      - key: RPC_URL
+        value: https://ethereum-sepolia-rpc.publicnode.com
+      - key: PRIVATE_KEY         # YALNIZCA test cuzdani
+        sync: false
+      - key: CERT_ANCHOR_ADDRESS
+        sync: false
+      - key: EXPLORER_TX_URL
+        value: https://sepolia.etherscan.io/tx/
+      # --- EVREN yapay zeka (istege bagli) ---
+      - key: EVREN_API_KEY       # evren.ssyz.org.tr/api-keys
+        sync: false
