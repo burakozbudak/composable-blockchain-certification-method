@@ -18,6 +18,8 @@ services:
         sync: false
       - key: DB_SSL
         value: "true"
+      - key: AUTO_INIT_DB        # bos veritabaninda semayi ilk acilista kurar
+        value: "true"
       - key: DB_SSL_CA           # Aiven → Overview → CA certificate (ca.pem icerigi)
         sync: false
       # --- Ethereum Sepolia (istege bagli) ---
