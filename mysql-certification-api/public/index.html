@@ -14,7 +14,8 @@
   header{background:var(--navy);color:#fff;padding:20px 28px}
   header h1{margin:0;font-size:20px;letter-spacing:.5px}
   header p{margin:4px 0 0;color:#9db4cc;font-size:13px}
-  .wrap{max-width:1080px;margin:24px auto;padding:0 20px;display:grid;gap:20px}
+  .wrap{max-width:1080px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+  .card{overflow-x:auto}
   .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
   .card h2{margin:0 0 14px;font-size:15px;color:var(--navy);border-left:3px solid var(--accent);padding-left:10px}
   table{width:100%;border-collapse:collapse;font-size:13px}
@@ -32,12 +33,31 @@
   .msg.ok{background:#e7f6f3;color:#0f6b5f;display:block}
   .msg.err{background:#fdeaea;color:#a82424;display:block}
   .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:#eef2f6;color:var(--muted)}
+  .ai h2{border-left-color:#7c5cff}
+  .ai-badge{font-size:10px;font-weight:600;color:#7c5cff;background:#f0ecff;border-radius:8px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+  .grid2>*{min-width:0}
+  @media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+  .kv span,.res{overflow-wrap:anywhere}
+  textarea{width:100%;min-height:64px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px;resize:vertical}
+  .chat{max-height:320px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+  .bubble{padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.45;white-space:pre-wrap;max-width:92%}
+  .bubble.u{background:#eef2f6;align-self:flex-end}
+  .bubble.a{background:#f5f2ff;align-self:flex-start}
+  .muted{color:var(--muted);font-size:12px}
+  .kv{font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin-top:10px}
+  .kv b{font-weight:600;color:var(--navy)}
+  .ok-t{color:#0f6b5f}.no-t{color:#a82424}
+  .res{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:13px}
+  .res .h{display:flex;justify-content:space-between;gap:10px;font-weight:600;color:var(--navy)}
+  .ai-off{display:none;font-size:13px;background:#fff7e6;color:#8a5a00;border-radius:6px;padding:8px 12px;margin-bottom:10px}
+  input.wide{width:100%}
 </style>
 </head>
 <body>
 <header>
   <h1>HydroCert · Yenilenebilir Hidrojen Sertifikasyon Paneli</h1>
-  <p>Türkiye–AB Yeşil Hidrojen Koridoru · MySQL + Node.js + Ethereum <span id="zincir-durum" class="pill" style="margin-left:6px">zincir: …</span></p>
+  <p>Türkiye–AB Yeşil Hidrojen Koridoru · MySQL + Node.js + Ethereum + EVREN YZ <span id="zincir-durum" class="pill" style="margin-left:6px">zincir: …</span> <span id="evren-durum" class="pill">EVREN: …</span></p>
 </header>
 
 <div class="wrap">
@@ -90,6 +110,49 @@
       <thead><tr><th>Seri No</th><th class="num">Parti</th><th class="num">kg</th><th>Zincir Durumu</th><th>İşlem</th></tr></thead>
       <tbody><tr><td colspan="5" style="color:var(--muted)">Yükleniyor…</td></tr></tbody>
     </table>
+  </div>
+
+  <div class="grid2">
+    <div class="card ai">
+      <h2>CBAM / RED III Asistanı <span class="ai-badge">EVREN · glm-5.3</span></h2>
+      <div class="ai-off">EVREN anahtarı tanımlı değil; yapay zekâ özellikleri kapalı.</div>
+      <div id="chat" class="chat"><div class="bubble a">Panel verisi ve CBAM / RED III hakkında soru sorun. Örn: “Hangi sertifikalar RFNBO eşiğinin altında ve hâlâ geçerli?”</div></div>
+      <textarea id="soru" placeholder="Sorunuzu yazın…"></textarea>
+      <div class="row" style="margin-top:8px"><button onclick="sor()">Sor</button><span class="muted">Mevzuat yanıtları bilgilendirme amaçlıdır.</span></div>
+    </div>
+
+    <div class="card ai">
+      <h2>Belgeden Sertifika <span class="ai-badge">EVREN · dots-ocr</span></h2>
+      <div class="ai-off">EVREN anahtarı tanımlı değil; yapay zekâ özellikleri kapalı.</div>
+      <p class="muted" style="margin-top:0">Üretim raporu veya sertifika belgesinin görüntüsünü (PNG/JPEG/WebP) yükleyin; alanlar okunup “Sertifika İhraç Et” formuna aktarılır. Göndermeden önce kontrol edin.</p>
+      <input id="belge" type="file" accept="image/png,image/jpeg,image/webp" class="wide">
+      <div class="row" style="margin-top:8px"><button onclick="belgeOku()">Belgeyi Oku</button></div>
+      <div id="belge-msg" class="msg"></div>
+      <div id="belge-sonuc"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card ai">
+      <h2>Risk / Uyum Skoru <span class="ai-badge">EVREN · clef</span></h2>
+      <div class="row">
+        <div><label>Seri No</label><input id="risk-seri" value="DE-H2-2025-0001" style="width:200px"></div>
+        <button onclick="riskHesapla()">Değerlendir</button>
+      </div>
+      <div id="risk-msg" class="msg"></div>
+      <div id="risk-sonuc"></div>
+    </div>
+
+    <div class="card ai">
+      <h2>Anlamsal Arama <span class="ai-badge">EVREN · qwen3-embedding</span></h2>
+      <div class="ai-off">EVREN anahtarı tanımlı değil; yapay zekâ özellikleri kapalı.</div>
+      <div class="row">
+        <div style="flex:1"><label>Doğal dilde arayın</label><input id="ara-sorgu" class="wide" placeholder="ör. Almanya'daki rüzgâr kaynaklı denetimli sertifikalar"></div>
+        <button onclick="ara()">Ara</button>
+      </div>
+      <div id="ara-msg" class="msg"></div>
+      <div id="ara-sonuc"></div>
+    </div>
   </div>
 
 </div>
@@ -157,6 +220,107 @@ async function ihracEt(){
   }
 }
 
+
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function goster(el, tur, html){ el.className = "msg " + tur; el.innerHTML = html; }
+async function postJSON(url, body){
+  const r = await fetch(API + url, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+  const d = await r.json().catch(() => ({hata:"Geçersiz yanıt"}));
+  if(!r.ok) throw new Error(d.hata || "Hata");
+  return d;
+}
+
+// --- Asistan
+const gecmis = [];
+async function sor(){
+  const ta = document.querySelector("#soru");
+  const soru = ta.value.trim(); if(!soru) return;
+  const chat = document.querySelector("#chat");
+  chat.insertAdjacentHTML("beforeend", `<div class="bubble u">${esc(soru)}</div>`);
+  const bekle = document.createElement("div"); bekle.className = "bubble a muted"; bekle.textContent = "Düşünüyor…";
+  chat.appendChild(bekle); chat.scrollTop = chat.scrollHeight; ta.value = "";
+  try{
+    const d = await postJSON("/ai/asistan", {soru, gecmis});
+    bekle.className = "bubble a"; bekle.textContent = d.yanit;
+    gecmis.push({role:"user", content:soru}, {role:"assistant", content:d.yanit});
+  }catch(e){ bekle.className = "bubble a no-t"; bekle.textContent = "✗ " + e.message; }
+  chat.scrollTop = chat.scrollHeight;
+}
+document.addEventListener("keydown", e => { if(e.target.id === "soru" && e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sor(); } });
+
+// --- Belgeden sertifika: görseli küçültüp (uzun kenar 1600px) data URL olarak gönder
+function gorselHazirla(file){
+  return new Promise((ok, red) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      ok(c.toDataURL("image/jpeg", 0.9));
+    };
+    img.onerror = () => red(new Error("Görsel okunamadı"));
+    img.src = URL.createObjectURL(file);
+  });
+}
+async function belgeOku(){
+  const f = document.querySelector("#belge").files[0];
+  const msg = document.querySelector("#belge-msg"), out = document.querySelector("#belge-sonuc");
+  if(!f){ goster(msg, "err", "Önce bir görsel seçin"); return; }
+  goster(msg, "ok", "Belge okunuyor (OCR + alan çıkarımı)…"); out.innerHTML = "";
+  try{
+    const d = await postJSON("/ai/belge", {gorsel: await gorselHazirla(f)});
+    const a = d.alanlar || {};
+    const alanlar = ["parti_id","seri_no","toplam_kg","ihrac_tarihi","gecerlilik"];
+    alanlar.forEach(k => { if(a[k] !== null && a[k] !== undefined && a[k] !== "") document.querySelector("#" + k).value = a[k]; });
+    goster(msg, "ok", `✓ Alanlar forma aktarıldı (güven: ${esc(a.guven || "?")}). “Sertifika İhraç Et” kartında kontrol edip gönderin.`);
+    out.innerHTML = `<div class="kv">${Object.entries(a).map(([k,v]) => `<b>${esc(k)}</b><span>${esc(v === null ? "—" : v)}</span>`).join("")}</div>
+      <details style="margin-top:8px"><summary class="muted">OCR metni</summary><pre style="white-space:pre-wrap;font-size:12px">${esc(d.ocr_metni)}</pre></details>`;
+  }catch(e){ goster(msg, "err", "✗ " + esc(e.message)); }
+}
+
+// --- Risk skoru
+async function riskHesapla(){
+  const seri = document.querySelector("#risk-seri").value.trim(); if(!seri) return;
+  const msg = document.querySelector("#risk-msg"), out = document.querySelector("#risk-sonuc");
+  goster(msg, "ok", "Değerlendiriliyor…"); out.innerHTML = "";
+  try{
+    const r = await fetch(API + "/ai/risk/" + encodeURIComponent(seri));
+    const d = await r.json(); if(!r.ok) throw new Error(d.hata || "Hata");
+    msg.className = "msg";
+    let html = `<div class="kv">` + d.kurallar.map(k =>
+      `<b class="${k.gecti ? "ok-t" : "no-t"}">${k.gecti ? "✓" : "✗"} ${esc(k.ad)}</b><span>${esc(k.detay)}</span>`).join("") + `</div>`;
+    if(d.model){
+      const m = d.model, yuzde = v => (v * 100).toFixed(0) + "%";
+      const risk = m.risk_duzeyi || {}, bel = m.belge_yeterliligi || {}, rf = m.rfnbo_uyum || {};
+      const belEt = bel.legend ? bel.legend[String(Math.round(bel.score))] : "";
+      html += `<div class="res"><div class="h"><span>Model değerlendirmesi (clef)</span><span>risk: ${esc(risk.choice || "?")}</span></div>
+        <div class="kv"><b>RFNBO uyum olasılığı</b><span>${rf.noul !== undefined ? yuzde(rf.noul) : "—"}</span>
+        <b>Belge yeterliliği</b><span>${bel.score !== undefined ? bel.score.toFixed(2) + " / 2 (" + esc(belEt) + ")" : "—"}</span>
+        <b>Risk olasılıkları</b><span>${risk.probabilities ? Object.entries(risk.probabilities).map(([k,v]) => esc(k) + " " + yuzde(v)).join(" · ") : "—"}</span></div></div>`;
+    }else if(d.model_hatasi){
+      html += `<p class="muted">Model değerlendirmesi alınamadı: ${esc(d.model_hatasi)}</p>`;
+    }else if(!d.evren){
+      html += `<p class="muted">EVREN kapalı — yalnızca kural tabanlı kontroller gösteriliyor.</p>`;
+    }
+    out.innerHTML = html;
+  }catch(e){ goster(msg, "err", "✗ " + esc(e.message)); }
+}
+
+// --- Anlamsal arama
+async function ara(){
+  const sorgu = document.querySelector("#ara-sorgu").value.trim(); if(!sorgu) return;
+  const msg = document.querySelector("#ara-msg"), out = document.querySelector("#ara-sonuc");
+  goster(msg, "ok", "Aranıyor…"); out.innerHTML = "";
+  try{
+    const d = await postJSON("/ai/ara", {sorgu});
+    msg.className = "msg";
+    out.innerHTML = d.sonuclar.length ? d.sonuclar.map(s => `<div class="res"><div class="h"><span>${esc(s.baslik)}</span>
+      <span class="pill">${esc(s.tur)}</span></div><div class="muted" style="margin-top:4px">${esc(s.metin)}</div></div>`).join("")
+      + `<p class="muted">Sıralama: ${esc(d.siralama)}</p>` : `<p class="muted">Sonuç yok</p>`;
+  }catch(e){ goster(msg, "err", "✗ " + esc(e.message)); }
+}
+
 async function loadDurum(){
   try{
     const r = await fetch(API + "/durum");
@@ -165,6 +329,11 @@ async function loadDurum(){
     el.textContent = "zincir: " + d.zincir;
     el.style.background = d.zincir === "aktif" ? "#e7f6f3" : "#fdeaea";
     el.style.color = d.zincir === "aktif" ? "#0f6b5f" : "#a82424";
+    const ev = document.querySelector("#evren-durum");
+    ev.textContent = "EVREN: " + d.evren;
+    ev.style.background = d.evren === "aktif" ? "#f0ecff" : "#fdeaea";
+    ev.style.color = d.evren === "aktif" ? "#5b3fd6" : "#a82424";
+    if(d.evren !== "aktif") document.querySelectorAll(".ai-off").forEach(x => x.style.display = "block");
   }catch(e){}
 }
 
